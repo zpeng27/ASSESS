@@ -1,8 +1,7 @@
 # ASSESS
 Estimating Node Abnormalities from Imprecise Subgraph-Level Supervision
 
-![illustration](https://github.com/user-attachments/assets/eba3efe7-6cee-4683-9943-abca0c8058c6)
-
+![image](https://github.com/zpeng27/ASSESS/blob/main/illustration.jpg)
 
 ## Overview
 The repository is organized as follows:
