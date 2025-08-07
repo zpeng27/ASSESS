@@ -42,6 +42,7 @@ class WeakAD(nn.Module):
         ranking_loss = torch.tensor(0.0).to(self.device)
         sp_loss = torch.tensor(0.0).to(self.device)
         hom_loss = torch.tensor(0.0).to(self.device)
+        ranking_inner_loss = torch.tensor(0.0).to(self.device)
 
         
         for i in range(len(a_subg_list)):
@@ -49,6 +50,7 @@ class WeakAD(nn.Module):
             a_mil_score = node_score[a_idxs].flatten()
             hom_loss = hom_loss+torch.mm(a_mil_score.unsqueeze(0), torch.spmm(a_subg_lap[i], a_mil_score.unsqueeze(1))).squeeze()
             a_mil_score_sort, _ = torch.sort(a_mil_score, descending=True)
+            a_mil_avg_idx = torch.where(a_mil_score_sort<torch.mean(a_mil_score_sort))[0][0]
 
             n_idxs = n_subg_list[i]
             n_mil_score = node_score[n_idxs].flatten()
@@ -56,18 +58,20 @@ class WeakAD(nn.Module):
             n_mil_score_sort, _ = torch.sort(n_mil_score, descending=True)
 
             ranking_loss = ranking_loss+torch.relu(1.0-a_mil_score_sort[0]+n_mil_score_sort[0])
+            ranking_inner_loss = ranking_inner_loss+torch.relu(1.0-a_mil_score_sort[0]+a_mil_score_sort[a_mil_avg_idx])
             
             sp_loss = sp_loss+torch.sum(a_mil_score)
 
         ranking_loss = ranking_loss/len(a_subg_list)
         sp_loss = sp_loss/len(a_subg_list)
         hom_loss = hom_loss/(len(a_subg_list)*2)
+        ranking_inner_loss = ranking_inner_loss/len(a_subg_list)
 
         ############# reconstruction loss ##############
 
         adj_rebuilt = torch.sigmoid(torch.mm(node_vec, torch.t(node_vec)))
 
-        return ranking_loss, sp_loss, hom_loss, adj_rebuilt, res_mi_pos, res_mi_neg, res_local_pos, res_local_neg
+        return ranking_loss, ranking_inner_loss, sp_loss, hom_loss, adj_rebuilt, res_mi_pos, res_mi_neg, res_local_pos, res_local_neg
 
     def get_refiend_score(self, adj, feat):
 
