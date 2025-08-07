@@ -127,7 +127,7 @@ def get_subg_abnorm(adj, gnd, number_label_gnd_center, dataset_file, device):
 def load_data(dataset_file, number_label_gnd_center, device):
     """Load data."""
     
-    with open('../GRADATE-main/dataset/reddit.pkl', 'rb') as f:
+    with open(dataset_file, 'rb') as f:
         data = pickle.load(f)
         adj = build_symmetric(data['A'])
         feature = data['X']
@@ -168,8 +168,8 @@ def preprocess_features(features):
     print (features)
     print (np.max(features))
     print (np.min(features))
-    features = features*10
-    # features = preprocessing.normalize(features, norm='l2', axis=1)
+    features = features*10  #you could change the preprocessing strategy according to the dataset
+    #features = preprocessing.normalize(features, norm='l2', axis=1)
     print ('preprocessed feat')
     print (features)
     print (np.max(features))
